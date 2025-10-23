@@ -265,6 +265,7 @@ class ScreenshotEditor {
     showPreview() {
         document.getElementById('dropZone').style.display = 'none';
         document.getElementById('previewSection').style.display = 'block';
+        document.querySelector('.header').style.display = 'none';
     }
 
 
@@ -441,6 +442,7 @@ class ScreenshotEditor {
     hidePreview() {
         document.getElementById('previewSection').style.display = 'none';
         document.getElementById('dropZone').style.display = 'block';
+        document.querySelector('.header').style.display = 'block';
     }
 }
 
