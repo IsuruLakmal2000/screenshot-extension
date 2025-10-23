@@ -52,6 +52,12 @@
                             <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
                         </svg>
                     </button>
+                    <button class="tool-btn" data-tool="blur" title="Blur Text">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M12 1v6M12 17v6M4.22 4.22l4.24 4.24M15.54 15.54l4.24 4.24M1 12h6M17 12h6M4.22 19.78l4.24-4.24M15.54 8.46l4.24-4.24"/>
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Preview Area -->
@@ -133,12 +139,43 @@
                     </div>
                 </div>
 
+                <!-- Blur Options -->
+                <div class="option-content" id="blur-options">
+                    <div class="option-header">
+                        <h3>Blur Text</h3>
+                    </div>
+                    <div class="blur-controls">
+                        <div class="slider-group">
+                            <label>Blur Size:</label>
+                            <input type="range" id="blurSizeSlider" min="5" max="50" value="20">
+                            <span class="blur-size-value">20px</span>
+                        </div>
+                        <div class="blur-actions">
+                            <button id="clearBlursBtn" class="btn btn-secondary">Clear All Blurs</button>
+                            <p class="blur-instruction">Click on the screenshot to blur areas</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button id="downloadBtn" class="btn btn-primary">Download</button>
                     <button id="resetBtn" class="btn btn-secondary">Reset</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="developer-info">
+            <span>Developed by </span>
+            <a href="https://x.com/I5uru1" target="_blank" rel="noopener noreferrer">i5uru</a>
+        </div>
+        <div class="support-info">
+            <a href="https://paypal.me/isurulakmal" target="_blank" rel="noopener noreferrer" class="support-link">
+                Support Development ❤️
+            </a>
         </div>
     </div>
 

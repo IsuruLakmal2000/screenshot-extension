@@ -350,6 +350,39 @@ body {
 
 
 
+.blur-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.blur-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.blur-instruction {
+    font-size: 12px;
+    color: #666666;
+    margin: 0;
+    font-style: italic;
+}
+
+.preview-container.blur-mode {
+    cursor: crosshair;
+}
+
+.blur-indicator {
+    position: absolute;
+    border: 2px dashed #000000;
+    border-radius: 50%;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
 .action-buttons {
     display: flex;
     gap: 16px;
@@ -433,6 +466,54 @@ body::-webkit-scrollbar-thumb:hover {
     background: #cccccc;
 }
 
+/* Footer Styles */
+.footer {
+    margin-top: auto;
+    padding: 16px 24px;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+    text-align: center;
+    font-size: 13px;
+    color: #666666;
+}
+
+.developer-info {
+    margin-bottom: 8px;
+}
+
+.developer-info a {
+    color: #000000;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.developer-info a:hover {
+    color: #333333;
+    text-decoration: underline;
+}
+
+.support-info .support-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #000000;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    font-size: 12px;
+}
+
+.support-info .support-link:hover {
+    background: #f5f5f5;
+    border-color: #cccccc;
+    transform: translateY(-1px);
+}
+
 /* Responsive adjustments */
 @media (max-width: 520px) {
     body {
@@ -455,5 +536,9 @@ body::-webkit-scrollbar-thumb:hover {
     .aspect-btn {
         padding: 8px 12px;
         min-width: 45px;
+    }
+    
+    .footer {
+        padding: 12px 20px;
     }
 }

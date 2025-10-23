@@ -8,6 +8,9 @@ class ScreenshotEditor {
         this.currentAspectRatio = 'original';
         this.currentPadding = 20;
         this.currentBorderRadius = 0;
+        this.currentBlurSize = 20;
+        this.blurAreas = [];
+        this.isBlurMode = false;
         
         this.initializeEventListeners();
     }
@@ -27,6 +30,9 @@ class ScreenshotEditor {
         const colorPresets = document.querySelectorAll('.color-preset');
         const toolBtns = document.querySelectorAll('.tool-btn');
         const optionContents = document.querySelectorAll('.option-content');
+        const blurSizeSlider = document.getElementById('blurSizeSlider');
+        const blurSizeValue = document.querySelector('.blur-size-value');
+        const clearBlursBtn = document.getElementById('clearBlursBtn');
 
         // Drag and drop events
         dropZone.addEventListener('dragover', this.handleDragOver.bind(this));
@@ -54,6 +60,15 @@ class ScreenshotEditor {
                 const targetOption = document.getElementById(`${tool}-options`);
                 if (targetOption) {
                     targetOption.classList.add('active');
+                }
+                
+                // Handle blur mode
+                this.isBlurMode = (tool === 'blur');
+                const previewContainer = document.querySelector('.preview-container');
+                if (this.isBlurMode) {
+                    previewContainer.classList.add('blur-mode');
+                } else {
+                    previewContainer.classList.remove('blur-mode');
                 }
             });
         });
@@ -87,6 +102,33 @@ class ScreenshotEditor {
             this.currentBorderRadius = parseInt(e.target.value);
             radiusValue.textContent = `${this.currentBorderRadius}%`;
             this.updatePreview();
+        });
+
+        // Blur size slider
+        blurSizeSlider.addEventListener('input', (e) => {
+            this.currentBlurSize = parseInt(e.target.value);
+            blurSizeValue.textContent = `${this.currentBlurSize}px`;
+        });
+
+        // Clear blurs button
+        clearBlursBtn.addEventListener('click', () => {
+            this.blurAreas = [];
+            this.updatePreview();
+        });
+
+        // Canvas click for blur
+        this.canvas.addEventListener('click', (e) => {
+            if (!this.isBlurMode || !this.originalImage) return;
+            
+            const rect = this.canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Convert to actual canvas coordinates
+            const canvasX = (x / this.canvas.clientWidth) * this.canvas.width;
+            const canvasY = (y / this.canvas.clientHeight) * this.canvas.height;
+            
+            this.addBlurArea(canvasX, canvasY);
         });
 
         // Aspect ratio buttons
@@ -260,6 +302,80 @@ class ScreenshotEditor {
         if (this.currentBorderRadius > 0) {
             this.ctx.restore();
         }
+
+        // Apply blur areas
+        this.applyBlurAreas();
+    }
+
+    addBlurArea(x, y) {
+        const scaleX = this.canvas.width / this.actualCanvasWidth;
+        const blurRadius = this.currentBlurSize * scaleX;
+        
+        this.blurAreas.push({
+            x: x,
+            y: y,
+            radius: blurRadius
+        });
+        
+        this.updatePreview();
+    }
+
+    applyBlurAreas() {
+        this.blurAreas.forEach(blur => {
+            // Get image data for the blur area
+            const imageData = this.ctx.getImageData(
+                blur.x - blur.radius,
+                blur.y - blur.radius,
+                blur.radius * 2,
+                blur.radius * 2
+            );
+            
+            // Apply blur effect
+            this.blurImageData(imageData, 10);
+            
+            // Create a circular mask
+            this.ctx.save();
+            this.ctx.beginPath();
+            this.ctx.arc(blur.x, blur.y, blur.radius, 0, Math.PI * 2);
+            this.ctx.clip();
+            
+            // Put the blurred image data back
+            this.ctx.putImageData(imageData, blur.x - blur.radius, blur.y - blur.radius);
+            this.ctx.restore();
+        });
+    }
+
+    blurImageData(imageData, strength) {
+        const data = imageData.data;
+        const width = imageData.width;
+        const height = imageData.height;
+        
+        // Simple box blur algorithm
+        for (let i = 0; i < strength; i++) {
+            for (let y = 1; y < height - 1; y++) {
+                for (let x = 1; x < width - 1; x++) {
+                    const idx = (y * width + x) * 4;
+                    
+                    // Average with surrounding pixels
+                    let r = 0, g = 0, b = 0;
+                    let count = 0;
+                    
+                    for (let dy = -1; dy <= 1; dy++) {
+                        for (let dx = -1; dx <= 1; dx++) {
+                            const nidx = ((y + dy) * width + (x + dx)) * 4;
+                            r += data[nidx];
+                            g += data[nidx + 1];
+                            b += data[nidx + 2];
+                            count++;
+                        }
+                    }
+                    
+                    data[idx] = r / count;
+                    data[idx + 1] = g / count;
+                    data[idx + 2] = b / count;
+                }
+            }
+        }
     }
 
     showPreview() {
@@ -324,11 +440,47 @@ class ScreenshotEditor {
             tempCtx.restore();
         }
 
+        // Apply blur areas for download
+        this.applyBlurAreasToCanvas(tempCtx, tempCanvas.width, tempCanvas.height);
+
         // Download with high quality
         const link = document.createElement('a');
         link.download = `screenshot-edited-${Date.now()}.png`;
         link.href = tempCanvas.toDataURL('image/png', 1.0); // Maximum quality
         link.click();
+    }
+
+    applyBlurAreasToCanvas(ctx, canvasWidth, canvasHeight) {
+        // Scale blur areas to actual canvas size
+        const scaleX = canvasWidth / this.canvas.width;
+        const scaleY = canvasHeight / this.canvas.height;
+        
+        this.blurAreas.forEach(blur => {
+            const actualX = blur.x * scaleX;
+            const actualY = blur.y * scaleY;
+            const actualRadius = blur.radius * scaleX;
+            
+            // Get image data for the blur area
+            const imageData = ctx.getImageData(
+                Math.max(0, actualX - actualRadius),
+                Math.max(0, actualY - actualRadius),
+                Math.min(canvasWidth, actualRadius * 2),
+                Math.min(canvasHeight, actualRadius * 2)
+            );
+            
+            // Apply blur effect
+            this.blurImageData(imageData, 15);
+            
+            // Create a circular mask
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(actualX, actualY, actualRadius, 0, Math.PI * 2);
+            ctx.clip();
+            
+            // Put the blurred image data back
+            ctx.putImageData(imageData, actualX - actualRadius, actualY - actualRadius);
+            ctx.restore();
+        });
     }
 
     createRoundedPath(ctx, x, y, width, height, radiusPercent) {
@@ -398,12 +550,17 @@ class ScreenshotEditor {
         this.currentAspectRatio = 'original';
         this.currentPadding = 20;
         this.currentBorderRadius = 0;
+        this.currentBlurSize = 20;
+        this.blurAreas = [];
+        this.isBlurMode = false;
         
 
         document.getElementById('paddingSlider').value = '20';
         document.querySelector('.slider-value').textContent = '20px';
         document.getElementById('borderRadiusSlider').value = '0';
         document.querySelector('.radius-value').textContent = '0%';
+        document.getElementById('blurSizeSlider').value = '20';
+        document.querySelector('.blur-size-value').textContent = '20px';
         document.getElementById('fileInput').value = '';
         
         // Reset aspect ratio buttons
@@ -435,6 +592,9 @@ class ScreenshotEditor {
             content.classList.remove('active');
         });
         document.getElementById('aspect-options').classList.add('active');
+        
+        // Reset blur mode
+        document.querySelector('.preview-container').classList.remove('blur-mode');
         
         this.hidePreview();
     }
