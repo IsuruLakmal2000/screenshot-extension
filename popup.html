@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Background Editor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Screenshot Editor</h1>
+            <p>Create professional screenshots with custom backgrounds</p>
+        </div>
+        
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-content">
+                <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7,10 12,15 17,10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <h3>Drop your screenshot here</h3>
+                <p>or click to browse files</p>
+                <input type="file" id="fileInput" accept="image/*" hidden>
+            </div>
+        </div>
+
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <div class="main-content">
+                <!-- Left Toolbar -->
+                <div class="toolbar">
+                    <button class="tool-btn active" data-tool="aspect" title="Aspect Ratio">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </button>
+                    <button class="tool-btn" data-tool="padding" title="Padding">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <rect x="7" y="7" width="10" height="10" rx="1"/>
+                        </svg>
+                    </button>
+                    <button class="tool-btn" data-tool="radius" title="Border Radius">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+                        </svg>
+                    </button>
+                    <button class="tool-btn" data-tool="background" title="Background">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Preview Area -->
+                <div class="preview-container">
+                    <canvas id="previewCanvas"></canvas>
+                </div>
+            </div>
+            
+            <!-- Bottom Options Panel -->
+            <div class="options-panel">
+                <!-- Aspect Ratio Options -->
+                <div class="option-content active" id="aspect-options">
+                    <div class="option-header">
+                        <h3>Aspect Ratio</h3>
+                    </div>
+                    <div class="aspect-ratio-buttons">
+                        <button class="aspect-btn active" data-ratio="original">Original</button>
+                        <button class="aspect-btn" data-ratio="1:1">1:1</button>
+                        <button class="aspect-btn" data-ratio="4:3">4:3</button>
+                        <button class="aspect-btn" data-ratio="16:9">16:9</button>
+                        <button class="aspect-btn" data-ratio="3:2">3:2</button>
+                        <button class="aspect-btn" data-ratio="2:3">2:3</button>
+                    </div>
+                </div>
+
+                <!-- Padding Options -->
+                <div class="option-content" id="padding-options">
+                    <div class="option-header">
+                        <h3>Padding</h3>
+                    </div>
+                    <div class="slider-group">
+                        <input type="range" id="paddingSlider" min="0" max="100" value="20">
+                        <span class="slider-value">20px</span>
+                    </div>
+                </div>
+
+                <!-- Border Radius Options -->
+                <div class="option-content" id="radius-options">
+                    <div class="option-header">
+                        <h3>Border Radius</h3>
+                    </div>
+                    <div class="slider-group">
+                        <input type="range" id="borderRadiusSlider" min="0" max="50" value="0">
+                        <span class="radius-value">0%</span>
+                    </div>
+                </div>
+
+                <!-- Background Options -->
+                <div class="option-content" id="background-options">
+                    <div class="option-header">
+                        <h3>Background</h3>
+                    </div>
+                    <div class="color-grid">
+                        <!-- Color Presets -->
+                        <div class="color-presets">
+                            <div class="color-preset active" data-type="solid" data-value="#f3f4f6" style="background: #f3f4f6;" title="Light Gray"></div>
+                            <div class="color-preset" data-type="solid" data-value="#6b7280" style="background: #6b7280;" title="Gray"></div>
+                            <div class="color-preset" data-type="solid" data-value="#1f2937" style="background: #1f2937;" title="Dark Gray"></div>
+                            <div class="color-preset" data-type="solid" data-value="#3b82f6" style="background: #3b82f6;" title="Blue"></div>
+                            <div class="color-preset" data-type="solid" data-value="#ef4444" style="background: #ef4444;" title="Red"></div>
+                            <div class="color-preset" data-type="solid" data-value="#10b981" style="background: #10b981;" title="Green"></div>
+                            <div class="color-preset" data-type="solid" data-value="#f59e0b" style="background: #f59e0b;" title="Orange"></div>
+                            <div class="color-preset" data-type="solid" data-value="#8b5cf6" style="background: #8b5cf6;" title="Purple"></div>
+                        </div>
+                        
+                        <!-- Gradient Presets -->
+                        <div class="gradient-presets">
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" title="Blue Purple"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);" title="Pink Red"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);" title="Blue Cyan"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);" title="Green Cyan"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #fa709a 0%, #fee140 100%)" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);" title="Pink Yellow"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);" title="Mint Pink"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);" title="Coral Pink"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);" title="Purple Pink"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);" title="Peach"></div>
+                            <div class="color-preset" data-type="gradient" data-value="linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)" style="background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);" title="Sky Blue"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button id="downloadBtn" class="btn btn-primary">Download</button>
+                    <button id="resetBtn" class="btn btn-secondary">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
